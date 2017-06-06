@@ -1,2 +1,0 @@
-# myspider
-myspider for tieba
