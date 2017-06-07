@@ -17,7 +17,7 @@ class GetPhoto(object):
     def GetPhoto(self):
         html = self.gethtml()
         selection = etree.HTML(html)
-        photolist = selection.xpath('//*[@id="43813"]/div[3]/p/strong/img/@src')
+        photolist = selection.xpath('//*[@class="entry-common"]/div[3]/p/strong/img/@src')
         return photolist
 
     def Download(self,saveadrs):
@@ -31,14 +31,18 @@ class GetPhoto(object):
         print('下载完成')
 
 
-# class MyThread(Thread):
-#     def __init__(self, savfile,address):
-#         super(MyThread,self).__init__()
-#         self.savfile = savfile
-#         self.address = address
-#     def run(self):
-#         downthread = GetPhoto(self.address)
-#         downthread.Download(self.savfile)
+class MyThread(Thread):
+    def __init__(self, address, savfile):
+        Thread.__init__(self)
+        self.address = address
+        self.savfile = savfile
+    def run(self):
+        downthread = GetPhoto(self.address)
+        # print(downthread.gethtml())
+        downthread.Download(self.savfile)
+
+
+        # downthread.Download(self.savfile)
 
 
 
@@ -51,9 +55,11 @@ class GetPhoto(object):
 if __name__ == '__main__':
     address = 'http://fuliba.net/%E9%BB%91%E8%89%B2%E6%81%8B%E6%83%85.html'
     savadress = 'f:/fuliba/phot'
-    test = GetPhoto(address)
-    test.Download(savadress)
-    # t1 = MyThread(address, 'f:/fuliba/phot')
-    # t2 = MyThread(address, 'f:/fuliba/phot')
-    # t1.start()
-    # t2.start()
+    address1 = 'http://fuliba.net/%E6%BC%AB%E7%94%BB%E5%96%B5.html'
+    savadress1 = 'f:/fuliba/phot2'
+    # test = GetPhoto(address1)
+    # test.Download(savadress1)
+    t1 = MyThread(address, savadress)
+    t2 = MyThread(address1, savadress1)
+    t1.start()
+    t2.start()
