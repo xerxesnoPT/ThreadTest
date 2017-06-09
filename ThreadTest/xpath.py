@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 import threading
+import os
 from threading import Thread
 from lxml import etree
 class GetPhoto(object):
@@ -9,10 +10,16 @@ class GetPhoto(object):
     def gethtml(self):
         try:
             res = requests.get(self.url)
-            res.encoding = res.apparent_encoding
+            res.encoding = 'utf-8'
             return res.text
         except:
             return 'open url wrong'
+
+    def GetDownName(self):
+        html = self.gethtml()
+        selection = etree.HTML(html)
+        downname = selection.xpath('//*[@class="entry-common"]/header/h2/text()')
+        return downname[0].strip()
 
     def GetPhoto(self):
         html = self.gethtml()
@@ -32,17 +39,19 @@ class GetPhoto(object):
 
 
 class MyThread(Thread):
-    def __init__(self, address, savfile):
+    def __init__(self, address):
         Thread.__init__(self)
         self.address = address
-        self.savfile = savfile
     def run(self):
         downthread = GetPhoto(self.address)
-        # print(downthread.gethtml())
-        downthread.Download(self.savfile)
+        filename = downthread.GetDownName()
+        if not os.path.exists(filename):
+            os.system('mkdir %s'%filename)
+            downthread.Download(filename)
 
 
         # downthread.Download(self.savfile)
+
 
 
 
@@ -53,13 +62,27 @@ class MyThread(Thread):
         # // *[ @ id = "43813"] / div[3] / p[49] / strong / img
 
 if __name__ == '__main__':
-    address = 'http://fuliba.net/%E9%BB%91%E8%89%B2%E6%81%8B%E6%83%85.html'
-    savadress = 'f:/fuliba/phot'
-    address1 = 'http://fuliba.net/%E6%BC%AB%E7%94%BB%E5%96%B5.html'
-    savadress1 = 'f:/fuliba/phot2'
-    # test = GetPhoto(address1)
+    # address = 'http://fuliba.net/%E9%BB%91%E8%89%B2%E6%81%8B%E6%83%85.html'
+    # address1 = 'http://fuliba.net/%E6%BC%AB%E7%94%BB%E5%96%B5.html'
+    htmladdress = input('输入要爬取的福利吧网址,多个网址按;分割:')
+    htmllist = htmladdress.split(';')
+    # test = GetPhoto(htmladdress)
+    # filename = test.GetDownName()
+    # print(filename)
+    # if not os.path.exists(filename):
+    #     os.system('mkdir %s'%filename)
+    #     test.Download(filename)
     # test.Download(savadress1)
-    t1 = MyThread(address, savadress)
-    t2 = MyThread(address1, savadress1)
-    t1.start()
-    t2.start()
+    # t1 = MyThread(address, savadress)
+    # t2 = MyThread(address1, savadress1)
+    # t1.start()
+    # t2.start()
+    threadlist =[]
+    for adres in htmllist:
+        t = MyThread(adres)
+        t.start()
+
+
+
+
+
